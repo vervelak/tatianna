@@ -93,9 +93,9 @@ sub reload_script
 
 sub sayquote
 {
-	my $args  = $_[0] if defined $_[0];
-	my @dblist = ();
-	my @realentry = ();
+	my $args        = $_[0] if defined $_[0];
+	my @dblist      = ();
+	my @realentry   = ();
 	my @personquote = ();
 	\&tiedb($quotedb);
 	
@@ -107,20 +107,33 @@ sub sayquote
 			push( @realentry, $outtie );
 		}
 	
-    if(defined $args)
-    {
-			my $nickquote = $args;
-			chomp $nickquote;
-            # my @personquote = grep ( /(<?@?)$nickquote>/, @dblist );
-            $nickquote = lc($nickquote);
-            $nickquote =~ s/\*//g;
-            my @personquote = grep (/$nickquote/i, @dblist);
-			my $specrand = int(rand( scalar @personquote ) );
-			$server->command("MSG $channel [$1] $personquote[$specrand]") if defined $personquote[$specrand];
-	}
-	else
-    {
-			$server->command("MSG $channel [$realentry[$randno]] $dblist[$randno]");
+    if ( defined $args ) {
+			chomp($args);
+			if ( $args =~ m/\d{1,}/ && $args !~ m/\c{1,}/i ) {
+                	my $quote = $hquote{$args};
+                	
+                	if ( defined $quote ) {
+                	    
+                	    if ( exists $hquote{$args} && defined $hquote{$args} ) {
+                	        my $quote = $hquote{$args};
+                        	$server->command("MSG $channel [$args] - $quote");
+                        	return 0;
+                	    } else {
+                	        return 0;
+                	    }
+        	        }
+        	} 
+        	else {
+			    my $nickquote = lc($args);
+			    # my @personquote = grep ( /(<?@?)$nickquote>/, @dblist );
+                $nickquote =~ s/\*//g;
+                my @personquote = grep (/$nickquote/i, @dblist);
+    			my $specrand = int(rand( scalar @personquote ) );
+    			$server->command("MSG $channel [$1] $personquote[$specrand]") if defined $personquote[$specrand];
+        	}
+	} # if defined args
+	else {
+		$server->command("MSG $channel [$realentry[$randno]] $dblist[$randno]");
     }
 	
     untie %hquote;
