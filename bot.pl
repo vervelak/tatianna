@@ -80,18 +80,6 @@ sub foobar
     return;
 }
 
-# sub svn_update
-# {
-#    my $srv = shift;
-#    my $chn = shift;
-#   
-#    my $cmd = "svn update /home/tatianna2/home/tatianna/tatianna-work";
-#    system $cmd;
-#
-#    $srv->command("MSG $chn svn working directory updated");
-#    return;
-# }
-
 sub reload_script
 {
     my $srv = shift;
