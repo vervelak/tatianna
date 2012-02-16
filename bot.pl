@@ -28,10 +28,10 @@ $VERSION = '0.4';
     license     => 'GPLv3',
 );
 
-my $quotedb = '/home/argp/tatianna/irssiq.db';
+my $quotedb = 'irssiq.db';
 my @chanops = ();
 my %hquote = ();
-my $urldb = '/home/argp/tatianna/url.db';
+my $urldb = 'url.db';
 
 our ($server, $data, $nick, $whois, $channel);
 
