@@ -276,10 +276,6 @@ sub IfCases
     {
         \&help($server, $channel);
 	}
-    # elsif(/^!svn_update/i)
-    # {
-    #    \&svn_update($server, $channel);
-    # }
     elsif(/^!foobar/i)
     {
         \&foobar($server, $nick);
