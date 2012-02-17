@@ -28,10 +28,10 @@ $VERSION = '0.4';
     license     => 'GPLv3',
 );
 
-my $quotedb = '/home/argp/tatianna/irssiq.db';
+my $quotedb = 'irssiq.db';
 my @chanops = ();
 my %hquote = ();
-my $urldb = '/home/argp/tatianna/url.db';
+my $urldb = 'url.db';
 
 our ($server, $data, $nick, $whois, $channel);
 
@@ -80,18 +80,6 @@ sub foobar
     return;
 }
 
-# sub svn_update
-# {
-#    my $srv = shift;
-#    my $chn = shift;
-#   
-#    my $cmd = "svn update /home/tatianna2/home/tatianna/tatianna-work";
-#    system $cmd;
-#
-#    $srv->command("MSG $chn svn working directory updated");
-#    return;
-# }
-
 sub reload_script
 {
     my $srv = shift;
@@ -105,9 +93,9 @@ sub reload_script
 
 sub sayquote
 {
-	my $args  = $_[0] if defined $_[0];
-	my @dblist = ();
-	my @realentry = ();
+	my $args        = $_[0] if defined $_[0];
+	my @dblist      = ();
+	my @realentry   = ();
 	my @personquote = ();
 	\&tiedb($quotedb);
 	
@@ -119,20 +107,33 @@ sub sayquote
 			push( @realentry, $outtie );
 		}
 	
-    if(defined $args)
-    {
-			my $nickquote = $args;
-			chomp $nickquote;
-            # my @personquote = grep ( /(<?@?)$nickquote>/, @dblist );
-            $nickquote = lc($nickquote);
-            $nickquote =~ s/\*//g;
-            my @personquote = grep (/$nickquote/i, @dblist);
-			my $specrand = int(rand( scalar @personquote ) );
-			$server->command("MSG $channel [$1] $personquote[$specrand]") if defined $personquote[$specrand];
-	}
-	else
-    {
-			$server->command("MSG $channel [$realentry[$randno]] $dblist[$randno]");
+    if ( defined $args ) {
+			chomp($args);
+			if ( $args =~ m/\d{1,}/ && $args !~ m/\c{1,}/i ) {
+                	my $quote = $hquote{$args};
+                	
+                	if ( defined $quote ) {
+                	    
+                	    if ( exists $hquote{$args} && defined $hquote{$args} ) {
+                	        my $quote = $hquote{$args};
+                        	$server->command("MSG $channel [$args] - $quote");
+                        	return 0;
+                	    } else {
+                	        return 0;
+                	    }
+        	        }
+        	} 
+        	else {
+			    my $nickquote = lc($args);
+			    # my @personquote = grep ( /(<?@?)$nickquote>/, @dblist );
+                $nickquote =~ s/\*//g;
+                my @personquote = grep (/$nickquote/i, @dblist);
+    			my $specrand = int(rand( scalar @personquote ) );
+    			$server->command("MSG $channel [$1] $personquote[$specrand]") if defined $personquote[$specrand];
+        	}
+	} # if defined args
+	else {
+		$server->command("MSG $channel [$realentry[$randno]] $dblist[$randno]");
     }
 	
     untie %hquote;
@@ -288,10 +289,6 @@ sub IfCases
     {
         \&help($server, $channel);
 	}
-    # elsif(/^!svn_update/i)
-    # {
-    #    \&svn_update($server, $channel);
-    # }
     elsif(/^!foobar/i)
     {
         \&foobar($server, $nick);
@@ -550,98 +547,7 @@ sub getcfu($server, $channel, $nick)
  
 }
 
-#Karma Function
-#
-#/////////////////////////////////////////////////////////////////////////////////////
-
 my $CHANNEL  = '#penguins';    # FIXME : move to irssi attrib hash
-#my $rh_karma = {};
-
-#sub karma {
-#    my $server  = shift;
-#    my $msg     = shift;
-#    my $nick    = shift;
-#    my $address = shift;
-#    my $target  = shift;
-#
-#    return unless defined $server && defined $msg;
-#    
-#		if ( $msg =~ /[^\?+](\+\+)$/ ) {
-#        $msg =~ m@(.*?)\+\+@;
-#        &add_karma( $server, $1 );
-#    }
-#		elsif ( $msg =~ /[^\-+](\-\-)$/ ) {
-#        $msg =~ m@(.*?)\-\-@;
-#        &del_karma( $server, $1 );
-#    }
-#		elsif ( $msg =~ /[^\?+](\?\?)$/ ) {
-#        $msg =~ m@(.*?)\?\?@;
-#        &print_karma( $server, $1 );
-#    }
-#		else {
-#				return 0;
-#		}
-#}
-
-###########
-## Add karma to an element.
-
-#sub add_karma {
-#    my $server = shift;
-#    my $item   = shift;
-#
-#    return unless defined $item && defined $server;
-#
-#    $item =~ s@[\(,\)]@@g;
-#
-#    if ( exists $rh_karma->{$item} ) {
-#        $rh_karma->{$item}++;
-#    }
-#    else {
-#        $rh_karma->{$item} = 1;
-#    }
-#    &say( $server, $CHANNEL, "Added karma for $item [$rh_karma->{$item}]" );
-#}
-
-###########
-## Delete karma to an element.
-
-#sub del_karma {
-#    my $server = shift;
-#    my $item   = shift;
-#
-#
-#return unless defined $item && defined $server;
-#
-#    $item =~ s@[\(,\)]@@g;
-#
-#    if ( exists $rh_karma->{$item} ) {
-#        $rh_karma->{$item}--;
-#    }
-#    else {
-#        $rh_karma->{$item} = -1;
-#    }
-#    &say( $server, $CHANNEL, "Deleted karma for $item [$rh_karma->{$item}]" );
-#}
-
-###########
-## Query an elements karma
-
-#sub print_karma {
-#    my $server = shift;
-#    my $item   = shift;
-#
-#    return unless defined $server && defined $item;
-#
-#    $item =~ s@[\(,\)]@@g;
-#
-#    if ( exists $rh_karma->{$item} ) {
-#        &say( $server, $CHANNEL, "Karma for $item : $rh_karma->{$item}" );
-#    }
-#    else {
-#        &say( $server, $CHANNEL, "$item is karma neutral." );
-#    }
-#}
 
 ##########
 ## Wrapper around MSG
